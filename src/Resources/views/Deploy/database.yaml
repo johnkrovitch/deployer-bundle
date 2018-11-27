@@ -1,0 +1,2 @@
+- name: Update database schema (using migrations)
+  shell: '{{ deploy_helper.new_release_path }}/bin/console doctrine:migrations:migrate --no-interaction'

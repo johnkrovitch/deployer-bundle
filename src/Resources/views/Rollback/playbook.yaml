@@ -1,0 +1,26 @@
+---
+- hosts: all
+
+  tasks:
+    - name: Gather deployments facts
+      deploy_helper:
+        state: query
+        path: '{{ project_path }}'
+
+    - name: Find previous release
+      shell: ls {{ deploy_path }}/releases| grep -v {{ deploy_helper.previous_release }} | sort -r | head -1
+      register: previous_release
+
+    - fail: msg="No previous release found"
+      when: previous_release.stdout == ""
+
+    - name: Change the current link to the previous release {{ previous_release.stdout }}
+      file:
+        src: '{{ deploy_path }}/releases/{{ previous_release.stdout }}'
+        path: '{{ deploy_helper.current_path }}'
+        state: link
+
+    - name: Remove the rollbacked release ({{ deploy_helper.previous_release }})
+      file:
+        state: absent
+        path: '{{ deploy_helper.previous_release_path }}'

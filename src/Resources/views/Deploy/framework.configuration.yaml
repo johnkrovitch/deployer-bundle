@@ -1,0 +1,5 @@
+- name: Create the parameters.yml for Symfony
+  template:
+    src: '{{ framework.configuration_template }}'
+    dest: '{{ deploy_helper.new_release_path }}/app/config/parameters.yml'
+    force: yes

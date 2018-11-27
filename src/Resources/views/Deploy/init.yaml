@@ -1,0 +1,3 @@
+- name: Initialize the deploy structure
+  deploy_helper:
+    path: '{{ project_path }}'

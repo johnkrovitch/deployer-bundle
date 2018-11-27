@@ -1,0 +1,51 @@
+services:
+    ### Registry ###
+    JK\DeployBundle\Module\Registry\ModuleRegistry:
+        class: JK\DeployBundle\Module\Registry\ModuleRegistry
+        public: true
+
+    ### Modules ###
+    JK\DeployBundle\Module\Modules\DatabaseModule:
+        class: JK\DeployBundle\Module\Modules\DatabaseModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\PlaybookModule:
+        class: JK\DeployBundle\Module\Modules\PlaybookModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\EnvironmentVarsModule:
+        class: JK\DeployBundle\Module\Modules\EnvironmentVarsModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\AnsibleConfigurationModule:
+        class: \JK\DeployBundle\Module\Modules\AnsibleConfigurationModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\GitModule:
+        class: JK\DeployBundle\Module\Modules\GitModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\ComposerModule:
+        class: JK\DeployBundle\Module\Modules\ComposerModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\FrameworkConfigurationModule:
+        class: JK\DeployBundle\Module\Modules\FrameworkConfigurationModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\MakefileModule:
+        class: JK\DeployBundle\Module\Modules\MakefileModule
+        tags:
+            - {name: deploy.module}
+
+    JK\DeployBundle\Module\Modules\HostModule:
+        class: JK\DeployBundle\Module\Modules\HostModule
+        tags:
+            - {name: deploy.module}

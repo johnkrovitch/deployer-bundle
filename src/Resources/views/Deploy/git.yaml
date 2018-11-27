@@ -1,0 +1,10 @@
+- name: Clone the new release
+  git:
+    repo: '{{ git_repository }}'
+    dest: '{{ deploy_helper.new_release_path }}'
+    version: '{{ git_version }}'
+
+- name: Add an unfinished file, to allow cleanup on successful finalize
+  file:
+    path: '{{ deploy_helper.new_release_path }}/{{ deploy_helper.unfinished_filename }}'
+    state: touch

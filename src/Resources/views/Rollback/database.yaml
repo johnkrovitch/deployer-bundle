@@ -1,0 +1,15 @@
+- name: Create the user {{ database_user }} for the database {{ database_name }}
+  become: yes
+  mysql_user:
+      name: '{{ database_user }}'
+      password: '{{ database_password }}'
+      state: absent
+
+- name: 'Create the database {{ database_name }}'
+  become: yes
+  mysql_db:
+      name: '{{ database_name }}'
+      state: absent
+      login_user: '{{ database_root_user }}'
+      login_password: '{{ database_root_password }}'
+

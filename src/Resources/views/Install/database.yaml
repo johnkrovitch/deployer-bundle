@@ -1,0 +1,17 @@
+- name: 'Create the database {{ database_name }}'
+  become: yes
+  mysql_db:
+      name: '{{ database_name }}'
+      state: present
+      login_user: '{{ database_root_user }}'
+      login_password: ''
+
+- name: Create the user {{ database_user }} for the database {{ database_name }}
+  become: yes
+  mysql_user:
+      name: '{{ database_user }}'
+      password: '{{ database_password }}'
+      priv: '{{ database_name }}.*:ALL'
+      state: present
+      login_user: '{{ database_root_user }}'
+      login_password: '{{ database_root_password }}'

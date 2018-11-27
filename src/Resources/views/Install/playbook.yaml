@@ -1,0 +1,17 @@
+---
+- hosts: all
+  become: no
+
+  tasks:
+     - import_tasks: ../tasks/install/database.yml
+     - import_tasks: ../tasks/install/filesystem.yml
+     - import_tasks: ../tasks/install/apache.yml
+     - import_tasks: ../tasks/install/github.yml
+
+  handlers:
+    - name: Restart apache
+      become: yes
+      service:
+        name: apache2
+        state: restarted
+        enabled: yes

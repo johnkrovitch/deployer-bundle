@@ -1,0 +1,6 @@
+- name: Run composer install
+  composer:
+    command: install
+    working_dir: '{{ deploy_helper.new_release_path }}'
+    no_dev: false
+    optimize_autoloader: yes
