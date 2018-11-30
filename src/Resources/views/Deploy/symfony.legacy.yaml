@@ -12,7 +12,6 @@
     recurse: yes
   with_items:
     - '{{ deploy_helper.new_release_path }}/var'
-    - '{{ deploy_helper.new_release_path }}/web/media/cache/'
 
 - name: Remove the app_dev.php and app_test.php
   file:
@@ -21,9 +20,3 @@
   with_items:
     - '{{ deploy_helper.new_release_path }}/web/app_dev.php'
     - '{{ deploy_helper.new_release_path }}/web/app_test.php'
-
-- name: Ensure the media cache directory is created
-  file:
-    path: '{{ deploy_helper.new_release_path }}/web/media/cache'
-    state: directory
-    group: www-data

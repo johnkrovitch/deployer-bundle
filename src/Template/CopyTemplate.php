@@ -1,53 +1,28 @@
 <?php
 
-namespace JK\DeployBundle\Template\Twig;
+namespace JK\DeployBundle\Template;
 
-use JK\DeployBundle\Template\TemplateInterface;
 
-class TwigTemplate implements TemplateInterface
+class CopyTemplate implements TemplateInterface
 {
-    /**
-     * @var string
-     */
     private $source;
-
-    /**
-     * @var array
-     */
-    private $parameters;
-
-    /**
-     * @var string
-     */
     private $target;
-
-    /**
-     * @var string
-     */
     private $type;
-
-    private $appendToFile = false;
-
-    /**
-     * @var int
-     */
     private $priority;
 
     public function __construct(
         string $source,
         string $target,
         string $type,
-        array $parameters = [],
         int $priority = TemplateInterface::PRIORITY_APPLICATION
     ) {
         $this->source = $source;
         $this->target = $target;
-        $this->parameters = $parameters;
         $this->type = $type;
         $this->priority = $priority;
     }
 
-    public function getType(): string
+    public function getType()
     {
         return $this->type;
     }
@@ -59,7 +34,7 @@ class TwigTemplate implements TemplateInterface
 
     public function getParameters(): array
     {
-        return $this->parameters;
+        return [];
     }
 
     public function getTarget(): string
@@ -69,12 +44,7 @@ class TwigTemplate implements TemplateInterface
 
     public function appendToFile(): bool
     {
-        return $this->appendToFile;
-    }
-
-    public function setAppendToFile(bool $appendToFile): void
-    {
-        $this->appendToFile = $appendToFile;
+        return false;
     }
 
     public function getPriority(): int

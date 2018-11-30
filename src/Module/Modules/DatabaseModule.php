@@ -9,8 +9,6 @@ use Symfony\Component\Console\Question\Question;
 
 class DatabaseModule extends AbstractModule
 {
-    private $dsn;
-
     public function getName(): string
     {
         return 'database';
@@ -56,23 +54,11 @@ class DatabaseModule extends AbstractModule
         ];
     }
 
-    public function getEnvironmentVars(): array
-    {
-        $parameters = parse_url($this->dsn);
-
-        return [
-            'host' => $parameters['host'],
-            'port' => $parameters['port'],
-            'user' => $parameters['user'],
-            'password' => $parameters['pass'],
-            'name' => substr($parameters['path'], 1),
-        ];
-    }
-
     public function getTemplates(): array
     {
         return [
-            $this->createDeployTemplate('Deploy/database.yaml', 'tasks/deploy/database.yaml'),
+            // TODO move in sf module
+            $this->createCopyTemplate('Deploy/database.yaml', 'tasks/deploy/database.yaml', TemplateInterface::TYPE_DEPLOY),
             $this->createInstallTemplate('Install/database.yaml', 'tasks/install/database.yaml'),
             $this->createRollbackTemplate('Rollback/database.yaml', 'tasks/rollback/database.yaml'),
         ];

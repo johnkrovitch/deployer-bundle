@@ -1,0 +1,14 @@
+- name: Clear the Symfony cache
+  shell: '{{ deploy_helper.new_release_path }}/bin/console cache:clear --env=prod'
+
+- name: Warmup the Symfony cache
+  shell: '{{ deploy_helper.new_release_path }}/bin/console cache:warmup --env=prod'
+
+- name: Set the permissions for the Symfony cache directory
+  file:
+    path: '{{ item }}'
+    state: directory
+    group: www-data
+    recurse: yes
+  with_items:
+    - '{{ deploy_helper.new_release_path }}/var'

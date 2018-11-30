@@ -15,13 +15,8 @@ services:
         tags:
             - {name: deploy.module}
 
-    JK\DeployBundle\Module\Modules\EnvironmentVarsModule:
-        class: JK\DeployBundle\Module\Modules\EnvironmentVarsModule
-        tags:
-            - {name: deploy.module}
-
-    JK\DeployBundle\Module\Modules\AnsibleConfigurationModule:
-        class: \JK\DeployBundle\Module\Modules\AnsibleConfigurationModule
+    JK\DeployBundle\Module\Modules\DeployModule:
+        class: JK\DeployBundle\Module\Modules\DeployModule
         tags:
             - {name: deploy.module}
 
@@ -35,8 +30,8 @@ services:
         tags:
             - {name: deploy.module}
 
-    JK\DeployBundle\Module\Modules\FrameworkConfigurationModule:
-        class: JK\DeployBundle\Module\Modules\FrameworkConfigurationModule
+    JK\DeployBundle\Module\Modules\FrameworkModule:
+        class: JK\DeployBundle\Module\Modules\FrameworkModule
         tags:
             - {name: deploy.module}
 
@@ -49,3 +44,10 @@ services:
         class: JK\DeployBundle\Module\Modules\HostModule
         tags:
             - {name: deploy.module}
+
+    ### Cache ###
+    JK\DeployBundle\Cache\Cache:
+        class: JK\DeployBundle\Cache\Cache
+        arguments:
+            - '%kernel.cache_dir%'
+        public: true

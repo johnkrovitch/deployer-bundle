@@ -4,22 +4,21 @@ namespace JK\DeployBundle\Module;
 
 use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Exception\Exception;
+use JK\DeployBundle\Template\CopyTemplate;
 use JK\DeployBundle\Template\TemplateInterface;
-use JK\DeployBundle\Template\Twig\PlaceholderTemplate;
+use JK\DeployBundle\Template\Twig\TwigTemplate;
 use Symfony\Component\Filesystem\Filesystem;
 
 abstract class AbstractModule implements ModuleInterface
 {
-    const PRIORITY_INITIALIZE = -100;
-    const PRIORITY_SOURCE = 0;
-    const PRIORITY_APPLICATION = 100;
-    const PRIORITY_FINALIZE = 200;
-
     /**
      * @var Filesystem
      */
     protected $fileSystem;
 
+    /**
+     * @var string
+     */
     protected $rootDirectory = '';
 
     public function configure(ApplicationConfiguration $configuration): void
@@ -44,78 +43,86 @@ abstract class AbstractModule implements ModuleInterface
         return [];
     }
 
-    public function getPriority(): int
-    {
-        return self::PRIORITY_APPLICATION;
-    }
-
     public function getTemplates(): array
     {
         return [];
     }
 
-    /**
-     * @param string $resource
-     *
-     * @return bool|string
-     *
-     * @throws Exception
-     */
-    protected function getResourcePath(string $resource)
+    protected function createTwigTemplate(
+        string $source,
+        string $target,
+        string $type,
+        array $parameters = [],
+        int  $priority = TemplateInterface::PRIORITY_APPLICATION
+    ): TemplateInterface
     {
-        $path = realpath(__DIR__.'/../Resources/views/'.$resource);
-
-        if (false === $path) {
-            throw new Exception('The resource "'.$resource.'" does not exists');
-        }
-
-        return $path;
-    }
-
-    protected function createTemplate(string $source, string $target, string $type, array $parameters = []
-    ): PlaceholderTemplate
-    {
-        return new PlaceholderTemplate(
-            $this->getResourcePath($source),
+        return new TwigTemplate(
+            $source,
             $target,
             $type,
-            $parameters
+            $parameters,
+            $priority
+        );
+    }
+
+    protected function createCopyTemplate(
+        string $source,
+        string $target,
+        string $type,
+        int $priority = TemplateInterface::PRIORITY_APPLICATION,
+        string $resourceRoot = null
+    ): TemplateInterface {
+
+        if (null === $resourceRoot) {
+            $resourceRoot = __DIR__.'/../Resources/views/';
+        }
+        $source = $resourceRoot.$source;
+
+        return new CopyTemplate(
+            $source,
+            $target,
+            $type,
+            $priority
         );
     }
 
     protected function createDeployTemplate(
         string $source,
         string $target,
-        array $parameters = []
-    ): PlaceholderTemplate
+        array $parameters = [],
+        int  $priority = TemplateInterface::PRIORITY_APPLICATION
+    ): TemplateInterface
     {
-        return $this->createTemplate($source, $target, PlaceholderTemplate::TYPE_DEPLOY, $parameters);
+        return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_DEPLOY, $parameters, $priority);
     }
 
     protected function createInstallTemplate(
         string $source,
         string $target,
-        array $parameters = []
-    ): PlaceholderTemplate
+        array $parameters = [],
+        int  $priority = TemplateInterface::PRIORITY_APPLICATION
+    ): TemplateInterface
     {
-        return $this->createTemplate($source, $target, PlaceholderTemplate::TYPE_INSTALL, $parameters);
+        return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_INSTALL, $parameters, $priority);
     }
 
     protected function createRollbackTemplate(
         string $source,
         string $target,
-        array $parameters = []
-    ): PlaceholderTemplate
+        array $parameters = [],
+        int  $priority = TemplateInterface::PRIORITY_APPLICATION
+    ): TemplateInterface
     {
-        return $this->createTemplate($source, $target, PlaceholderTemplate::TYPE_ROLLBACK, $parameters);
+        return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_ROLLBACK, $parameters, $priority);
     }
 
     protected function createExtraTemplate(
         string $source,
         string $target,
-        array $parameters = []
-    ): PlaceholderTemplate
+        array $parameters = [],
+        int  $priority = TemplateInterface::PRIORITY_APPLICATION
+    ): TemplateInterface
     {
-        return $this->createTemplate($source, $target, PlaceholderTemplate::TYPE_EXTRA, $parameters);
+        return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_EXTRA, $parameters, $priority);
     }
 }

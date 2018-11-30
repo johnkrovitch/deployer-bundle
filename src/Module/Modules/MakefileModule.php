@@ -3,32 +3,45 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
-use JK\DeployBundle\Template\TemplateInterface;
-use JK\DeployBundle\Template\Twig\AppendTemplate;
+use JK\DeployBundle\Module\EnvironmentModuleInterface;
 
-class MakefileModule extends AbstractModule
+class MakefileModule extends AbstractModule implements EnvironmentModuleInterface
 {
+    /**
+     * @var array
+     */
+    private $env;
+
     public function getName(): string
     {
         return 'makefile';
     }
 
-    public function getExtraTemplate(): ?TemplateInterface
+    public function getTemplates(): array
     {
-        return null;
-        $source = $this->getResourcePath('Template/Makefile');
+        $source = 'Templates/Makefile.twig';
 
         if (file_exists($this->rootDirectory.'/../../Makefile.dist')) {
-            $source = $this->rootDirectory.'/Makefile';
+            $source = $this->rootDirectory.'/../../Makefile.dist';
         }
 
         if (file_exists($this->rootDirectory.'/makefile')) {
             $source = $this->rootDirectory.'/makefile';
         }
+        $template = $this->createExtraTemplate($source, '../../Makefile', [
+            'env' => $this->env['env'],
+        ]);
+        $template->setAppendToFile(true);
 
-        return new AppendTemplate(
-            $source,
-            'Makefile'
-        );
+        return [
+            $template,
+        ];
+    }
+
+    public function setEnv(array $env): void
+    {
+        $this->env = [
+            'env' => $env['hosts.env'],
+        ];
     }
 }

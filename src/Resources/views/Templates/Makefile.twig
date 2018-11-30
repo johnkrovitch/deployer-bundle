@@ -1,0 +1,19 @@
+###> deploy ###
+deploy@{{ env }}.validate-deploy:
+    ansible-playbook etc/ansible/playbooks/deploy.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+
+deploy@{{ env }}.validate-deploy:
+    ansible-playbook etc/ansible/playbooks/install.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+
+deploy@{{ env }}.validate-rollback:
+    ansible-playbook etc/ansible/playbooks/rollback.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+
+deploy@{{ env }}:
+    ansible-playbook etc/ansible/playbooks/deploy.yaml -i etc/ansible/hosts/{{ env }}.yaml
+
+deploy@{{ env }}.install:
+    ansible-playbook etc/ansible/playbooks/install.yaml -i etc/ansible/hosts/{{ env }}.yaml
+
+deploy@{{ env }}.rollback:
+    ansible-playbook etc/ansible/playbooks/rollback.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+###< deploy ###

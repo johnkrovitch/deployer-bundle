@@ -1,0 +1,13 @@
+---
+### Ansible ###
+ansible_host: {{ ansible_host }}
+ansible_user: {{ ansible_user }}
+ansible_port: {{ ansible_port }}
+
+{% for moduleName, module in data %}
+### {{ moduleName | capitalize }} ###
+{% for name, value in module %}
+{{ moduleName }}.{{ name }}: {{ value }}
+{% endfor %}
+
+{% endfor %}

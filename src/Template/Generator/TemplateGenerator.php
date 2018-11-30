@@ -3,6 +3,7 @@
 namespace JK\DeployBundle\Template\Generator;
 
 use JK\DeployBundle\Exception\Exception;
+use JK\DeployBundle\Template\CopyTemplate;
 use JK\DeployBundle\Template\TemplateInterface;
 use JK\DeployBundle\Template\Twig\TwigTemplate;
 use Symfony\Component\Filesystem\Filesystem;
@@ -39,13 +40,49 @@ class TemplateGenerator implements TemplateGeneratorInterface
      */
     public function generate(TemplateInterface $template): void
     {
-        if (!$template instanceof TwigTemplate) {
-            throw new Exception('The template class "'.get_class($template).'" is not supported');
+        if ($template instanceof TwigTemplate) {
+            $this->generateTwig($template);
+
+            return;
         }
+
+        if ($template instanceof CopyTemplate) {
+            $this->copyTemplate($template);
+
+            return;
+        }
+
+        throw new Exception('The template type "'.get_class($template).'" is not supported');
+    }
+
+    private function generateTwig(TwigTemplate $template): void
+    {
         $path = $this->rootDirectory.$template->getTarget();
+        $content = $this->twig->render($template->getSource(), $template->getParameters());
 
         if ($template->appendToFile()) {
-            $content = $this->twig->render($template->getSource(), $template->getParameters());
+            if (!$this->fileSystem->exists($path)) {
+                $this->fileSystem->touch($path);
+            }
+            $targetContent = file_get_contents($path);
+
+            if (false === strstr($targetContent, $content)) {
+                $this->fileSystem->appendToFile($path, PHP_EOL.$content);
+            }
+        } else {
+            $this
+                ->fileSystem
+                ->dumpFile($path, $content)
+            ;
+        }
+    }
+
+    private function copyTemplate(CopyTemplate $template)
+    {
+        $path = $this->rootDirectory.$template->getTarget();
+        $content = file_get_contents($template->getSource());
+
+        if ($template->appendToFile()) {
 
             if (!$this->fileSystem->exists($path)) {
                 $this->fileSystem->touch($path);
@@ -56,7 +93,6 @@ class TemplateGenerator implements TemplateGeneratorInterface
                 $this->fileSystem->appendToFile($path, PHP_EOL.$content);
             }
         } else {
-            $content = $this->twig->render($template->getSource(), $template->getParameters());
             $this
                 ->fileSystem
                 ->dumpFile($path, $content)

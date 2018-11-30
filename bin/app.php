@@ -4,7 +4,6 @@
 use JK\DeployBundle\Command\GenerateConfigurationCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 
 require __DIR__.'/../vendor/autoload.php';
 
@@ -17,12 +16,14 @@ $extension = $bundle->getContainerExtension();
 $container->registerExtension($extension);
 $container->loadFromExtension($extension->getAlias());
 
-$loader = new Twig_Loader_Filesystem(__DIR__.'/../src/Resources/views');
+$loader = new Twig_Loader_Filesystem(realpath(__DIR__.'/../src/Resources/views'));
 $twig = new Twig_Environment($loader, [
-    'cache' => __DIR__.'/../var/cache/twig',
+    'debug' => true,
+    //'cache' => __DIR__.'/../var/cache/twig',
+    'auto_reload' => true,
 ]);
 $container->set('twig', $twig);
-
+$container->setParameter('kernel.cache_dir', realpath(__DIR__.'/../var/cache'));
 $container->compile();
 
 $generateCommand = new GenerateConfigurationCommand();

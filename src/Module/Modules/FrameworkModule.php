@@ -3,11 +3,15 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
+use JK\DeployBundle\Module\ModuleInterface;
 use JK\DeployBundle\Template\TemplateInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class FrameworkConfigurationModule extends AbstractModule
+class FrameworkModule extends AbstractModule
 {
+    const FRAMEWORK_SYMFONY = 'symfony';
+    const FRAMEWORK_SYMFONY_LEGACY = 'symfony_legacy';
+
     private $framework = '';
 
     public function getName(): string
@@ -20,37 +24,47 @@ class FrameworkConfigurationModule extends AbstractModule
         $frameworkQuestion = new ChoiceQuestion(
             'What type of framework do you want to deploy (use symfony for Symfony >= 4.0)',
             [
-                'symfony',
-                'symfony2'
+                self::FRAMEWORK_SYMFONY,
+                self::FRAMEWORK_SYMFONY_LEGACY,
             ],
             0
         );
 
         return [
-            'framework' => $frameworkQuestion,
+            'type' => $frameworkQuestion,
         ];
     }
 
     public function collect(array $values): array
     {
-        $this->framework = $values['framework'];
+        $this->framework = $values['type'];
 
         return [];
     }
 
     public function getTemplates(): array
     {
+        $frameworkDeployMapping = [
+            self::FRAMEWORK_SYMFONY => 'Deploy/symfony.yaml',
+            self::FRAMEWORK_SYMFONY_LEGACY => 'Deploy/symfony.legacy.yaml',
+        ];
+
         return [
-            $this->getDeployTemplate(),
+            //$this->getDeployTemplate(),
             $this->getExtraTemplate(),
+            $this->createCopyTemplate(
+                $frameworkDeployMapping[$this->framework],
+                'tasks/deploy/framework.yaml',
+                TemplateInterface::TYPE_DEPLOY
+            ),
         ];
     }
 
     private function getDeployTemplate(): ?TemplateInterface
     {
         $mapping = [
-            'symfony' => '../../templates/symfony/env.yml.j2',
-            'symfony2' => '../../templates/symfony/parameters.yml.j2',
+            self::FRAMEWORK_SYMFONY => '../../templates/symfony/env.yml.j2',
+            self::FRAMEWORK_SYMFONY_LEGACY => '../../templates/symfony/parameters.yml.j2',
         ];
 
         return $this->createDeployTemplate(
@@ -63,12 +77,12 @@ class FrameworkConfigurationModule extends AbstractModule
     private function getExtraTemplate(): ?TemplateInterface
     {
         $mapping = [
-            'symfony' => 'Templates/symfony.env',
-            'symfony2' => 'Templates/symfony.parameters.yaml',
+            self::FRAMEWORK_SYMFONY => 'Templates/symfony.env',
+            self::FRAMEWORK_SYMFONY_LEGACY => 'Templates/symfony.parameters.yaml',
         ];
         $targetMapping = [
-            'symfony' => '.env',
-            'symfony2' => 'parameters.yml',
+            self::FRAMEWORK_SYMFONY => '.env',
+            self::FRAMEWORK_SYMFONY_LEGACY => 'parameters.yml',
         ];
 
         return $this->createExtraTemplate(

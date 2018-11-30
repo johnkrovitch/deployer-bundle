@@ -2,12 +2,16 @@
 
 namespace JK\DeployBundle\Command;
 
+use JK\DeployBundle\Cache\Cache;
+use JK\DeployBundle\Cache\CacheInterface;
 use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
 use JK\DeployBundle\Module\Registry\ModuleRegistry;
 use JK\DeployBundle\Module\Registry\ModuleRegistryInterface;
+use JK\DeployBundle\Module\TaskModuleInterface;
 use JK\DeployBundle\Template\Generator\TemplateGenerator;
-use JK\DeployBundle\Template\Twig\PlaceholderTemplate;
+use JK\DeployBundle\Template\TemplateInterface;
+use JK\DeployBundle\Template\Twig\TwigTemplate;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -15,7 +19,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
-use Symfony\Component\DependencyInjection\ParameterBag\FrozenParameterBag;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -36,9 +39,14 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
             ->addOption(
                 'clean',
                 'c',
-                InputOption::VALUE_OPTIONAL,
-                'Clean the deploy directory',
-                false
+                InputOption::VALUE_NONE,
+                'Clean the deploy directory'
+            )
+            ->addOption(
+                'clear-cache',
+                'cc',
+                InputOption::VALUE_NONE,
+                'Remove the cache before running the command'
             )
         ;
     }
@@ -48,79 +56,107 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         $io = new SymfonyStyle($input, $output);
         $io->title('Generating deploy configuration');
 
+        $cache = $this->container->get(Cache::class);
+
+        if ($input->getOption('clear-cache')) {
+            $cache->clear();
+        }
+
         /** @var ModuleRegistryInterface $registry */
         $registry = $this->container->get(ModuleRegistry::class);
         $environmentVars = [];
 
-        if ($input->hasOption('clean')) {
+        if ($input->getOption('clean')) {
             $this->clean($input->getOption('directory'));
         }
 
         $configuration = $this->createApplicationConfiguration([
             'root_directory' => $input->getOption('directory'),
         ]);
-        $io->text('Configuring modules...');
+        $io->write(' Configuring modules...');
 
         foreach ($registry->all() as $module) {
             $module->configure($configuration);
         }
-        $io->text('Configuring modules...[<info>OK</info>]');
-        $io->text('Collecting environment parameters...');
+        $io->write('[<info>OK</info>]');
+        $io->newLine();
+        $io->write(' Collecting environment parameters...');
 
-        foreach ($registry->all() as $module) {
-            $questions = $module->getQuestions();
-            $answers = [];
+        if (0 === count($cache->all())) {
+            foreach ($registry->all() as $module) {
+                $questions = $module->getQuestions();
+                $answers = [];
 
-            foreach ($questions as $parameterName => $question) {
-                $answers[$parameterName] = $io->askQuestion($question);
+                foreach ($questions as $name => $question) {
+                    $answer = $io->askQuestion($question);
+                    $answers[$name] = $answer;
+                    $cache->set($module->getName().'.'.$name, $answer);
+                }
+                $parameters = $module->collect($answers);
+
+                foreach ($parameters as $name => $value) {
+                    $environmentVars[$module->getName().'.'.$name] = $value;
+                }
             }
-            $parameters = $module->collect($answers);
+            $io->write('[<info>OK</info>]');
+            $io->newLine();
+        } else {
+            $io->newLine();
+            $io->write(' Loading data from cache...');
+            $answers = $cache->all();
 
-            foreach ($parameters as $name => $value) {
-                $environmentVars[$module->getName().'.'.$name] = $value;
+            foreach ($registry->all() as $module) {
+                $collectedData = [];
+
+                foreach ($answers as $name => $answer) {
+                    $data = explode('.', $name);
+
+                    if ($data[0] === $module->getName()) {
+                        $collectedData[$data[1]] = $answer;
+                    }
+                    $environmentVars[$name] = $answer;
+                }
+                $parameters = $module->collect($collectedData);
+
+                foreach ($parameters as $name => $value) {
+                    $environmentVars[$module->getName().'.'.$name] = $value;
+                }
             }
+            $io->write('[<info>OK</info>]');
+            $io->newLine();
         }
-        $io->text('Collecting environment parameters...[<info>OK</info>]');
-
-        $io->text('Collecting templates...');
+        $io->write(' Collecting templates...');
         $templates = [];
+        $lateModules = [];
 
         foreach ($registry->all() as $module) {
 
             if ($module instanceof EnvironmentModuleInterface) {
                 $module->setEnv($environmentVars);
             }
-
+            if ($module instanceof TaskModuleInterface) {
+                $lateModules[] = $module;
+                continue;
+            }
             foreach ($module->getTemplates() as $template) {
                 $templates[] = $template;
             }
         }
-        $io->text('Collecting templates...[<info>OK</info>]');
+        $io->write('[<info>OK</info>]');
+        $io->newLine();
 
-        $generator = new TemplateGenerator($configuration->get('root_directory'));
+
         $io->text('Generating deployment files...');
+        $tasks = $this->generateTemplates($templates, $configuration, $io);
+        $lateTemplates = [];
 
-        foreach ($templates as $template) {
-
-            if (!$configuration->get('deploy_tasks') && PlaceholderTemplate::TYPE_DEPLOY === $template->getType()) {
-                continue;
-            }
-
-            if (!$configuration->get('install_tasks') && PlaceholderTemplate::TYPE_INSTALL === $template->getType()) {
-                continue;
-            }
-
-            if (!$configuration->get('rollback_tasks') && PlaceholderTemplate::TYPE_ROLLBACK === $template->getType()) {
-                continue;
-            }
-
-            if (!$configuration->get('extra_tasks') && PlaceholderTemplate::TYPE_EXTRA === $template->getType()) {
-                continue;
-            }
-
-            $generator->generate($template);
-            $io->text('Generating '.$template->getTarget().'...[<info>OK</info>]');
+        foreach ($lateModules as $module) {
+            $module->setTasks($tasks);
+            $lateTemplates = array_merge($lateTemplates, $module->getTemplates());
         }
+
+        $this->generateTemplates($lateTemplates, $configuration, $io);
+
         $io->text('Generating deployment files...[<info>OK</info>]');
     }
 
@@ -144,7 +180,54 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         ;
 
         foreach ($finder as $fileInfo) {
-
+            unlink($fileInfo->getRealPath());
         }
+    }
+
+    /**
+     * @param TemplateInterface[]      $templates
+     * @param ApplicationConfiguration $configuration
+     * @param SymfonyStyle             $io
+     *
+     * @return array
+     */
+    private function generateTemplates(
+        array $templates,
+        ApplicationConfiguration $configuration,
+        SymfonyStyle $io
+    ): array {
+        $tasks = [];
+        $generator = new TemplateGenerator($configuration->get('root_directory'), $this->container->get('twig'));
+
+        usort($templates, function (TemplateInterface $template1, TemplateInterface $template2) {
+            return $template1->getPriority() >= $template2->getPriority();
+        });
+
+        foreach ($templates as $template) {
+
+            if (!$configuration->get('deploy_tasks') && TwigTemplate::TYPE_DEPLOY === $template->getType()) {
+                continue;
+            }
+
+            if (!$configuration->get('install_tasks') && TwigTemplate::TYPE_INSTALL === $template->getType()) {
+                continue;
+            }
+
+            if (!$configuration->get('rollback_tasks') && TwigTemplate::TYPE_ROLLBACK === $template->getType()) {
+                continue;
+            }
+
+            if (!$configuration->get('extra_tasks') && TwigTemplate::TYPE_EXTRA === $template->getType()) {
+                continue;
+            }
+
+            $generator->generate($template);
+
+            $tasks[$template->getType()][] = $template->getTarget();
+
+            $io->text('  |__'.$template->getTarget().'...[<info>OK</info>]');
+        }
+
+        return $tasks;
     }
 }

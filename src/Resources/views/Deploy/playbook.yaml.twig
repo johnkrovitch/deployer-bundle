@@ -1,0 +1,7 @@
+---
+- hosts: all
+
+  tasks:
+      {% for task in tasks %}
+- import_tasks: {{ task }}
+      {% endfor %}
