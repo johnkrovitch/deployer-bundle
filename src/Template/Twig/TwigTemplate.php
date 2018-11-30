@@ -4,7 +4,7 @@ namespace JK\DeployBundle\Template\Twig;
 
 use JK\DeployBundle\Template\TemplateInterface;
 
-class PlaceholderTemplate implements TemplateInterface
+class TwigTemplate implements TemplateInterface
 {
     const TYPE_DEPLOY = 'type.deploy';
     const TYPE_INSTALL = 'type.install';
@@ -14,7 +14,7 @@ class PlaceholderTemplate implements TemplateInterface
     /**
      * @var string
      */
-    private $name;
+    private $source;
 
     /**
      * @var array
@@ -31,9 +31,11 @@ class PlaceholderTemplate implements TemplateInterface
      */
     private $type;
 
-    public function __construct(string $name, string $target, string $type, array $parameters = [])
+    private $appendToFile = false;
+
+    public function __construct(string $source, string $target, string $type, array $parameters = [])
     {
-        $this->name = $name;
+        $this->source = $source;
         $this->target = $target;
         $this->parameters = $parameters;
         $this->type = $type;
@@ -46,7 +48,7 @@ class PlaceholderTemplate implements TemplateInterface
 
     public function getSource(): string
     {
-        return $this->name;
+        return $this->source;
     }
 
     public function getParameters(): array
@@ -57,5 +59,15 @@ class PlaceholderTemplate implements TemplateInterface
     public function getTarget(): string
     {
         return $this->target;
+    }
+
+    public function appendToFile(): bool
+    {
+        return $this->appendToFile;
+    }
+
+    public function setAppendToFile(bool $appendToFile): void
+    {
+        $this->appendToFile = $appendToFile;
     }
 }

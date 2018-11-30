@@ -11,4 +11,6 @@ interface TemplateInterface
     public function getParameters(): array;
 
     public function getTarget(): string;
+
+    public function appendToFile(): bool;
 }
