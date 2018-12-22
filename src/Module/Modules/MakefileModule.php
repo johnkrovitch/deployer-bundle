@@ -2,6 +2,7 @@
 
 namespace JK\DeployBundle\Module\Modules;
 
+use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\AbstractModule;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
 
@@ -12,9 +13,19 @@ class MakefileModule extends AbstractModule implements EnvironmentModuleInterfac
      */
     private $env;
 
+    /**
+     * @var string
+     */
+    private $prefix;
+
     public function getName(): string
     {
         return 'makefile';
+    }
+
+    public function configure(ApplicationConfiguration $configuration): void
+    {
+        $this->prefix = $configuration->get('prefix');
     }
 
     public function getTemplates(): array
@@ -30,6 +41,7 @@ class MakefileModule extends AbstractModule implements EnvironmentModuleInterfac
         }
         $template = $this->createExtraTemplate($source, '../../Makefile', [
             'env' => $this->env['env'],
+            'prefix' => $this->prefix,
         ]);
         $template->setAppendToFile(true);
 

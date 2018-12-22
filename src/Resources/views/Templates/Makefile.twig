@@ -1,19 +1,19 @@
 ###> deploy ###
-deploy@{{ env }}.validate-deploy:
-    ansible-playbook etc/ansible/playbooks/deploy.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+{{ env }}@install:
+	ansible-playbook {{ prefix }}/playbooks/install.yaml -i {{ prefix }}/hosts/{{ env }}.yaml
 
-deploy@{{ env }}.validate-deploy:
-    ansible-playbook etc/ansible/playbooks/install.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+{{ env }}@install.validate:
+	ansible-playbook {{ prefix }}/playbooks/install.yaml -i {{ prefix }}/hosts/{{ env }}.yaml --check --diff
 
-deploy@{{ env }}.validate-rollback:
-    ansible-playbook etc/ansible/playbooks/rollback.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+{{ env }}@deploy:
+	ansible-playbook {{ prefix }}/playbooks/deploy.yaml -i {{ prefix }}/hosts/{{ env }}.yaml
 
-deploy@{{ env }}:
-    ansible-playbook etc/ansible/playbooks/deploy.yaml -i etc/ansible/hosts/{{ env }}.yaml
+{{ env }}@deploy.validate:
+	ansible-playbook {{ prefix }}/playbooks/deploy.yaml -i {{ prefix }}/hosts/{{ env }}.yaml --check --diff
 
-deploy@{{ env }}.install:
-    ansible-playbook etc/ansible/playbooks/install.yaml -i etc/ansible/hosts/{{ env }}.yaml
+{{ env }}@rollback:
+	ansible-playbook {{ prefix }}/playbooks/rollback.yaml -i {{ prefix }}/hosts/{{ env }}.yaml --check --diff
 
-deploy@{{ env }}.rollback:
-    ansible-playbook etc/ansible/playbooks/rollback.yaml -i etc/ansible/hosts/{{ env }}.yaml --check --diff
+{{ env }}@rollback.validate:
+	ansible-playbook {{ prefix }}/playbooks/rollback.yaml -i {{ prefix }}/hosts/{{ env }}.yaml --check --diff
 ###< deploy ###

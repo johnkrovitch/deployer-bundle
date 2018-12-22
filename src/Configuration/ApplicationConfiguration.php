@@ -15,6 +15,7 @@ class ApplicationConfiguration extends Configuration
                 'install_tasks' => true,
                 'rollback_tasks' => true,
                 'extra_tasks' => true,
+                'prefix' => 'etc/ansible',
             ])
             ->setRequired([
                 'root_directory',

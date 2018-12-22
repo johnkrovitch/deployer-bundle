@@ -48,6 +48,13 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
                 InputOption::VALUE_NONE,
                 'Remove the cache before running the command'
             )
+            ->addOption(
+                'prefix',
+                'p',
+                InputOption::VALUE_OPTIONAL,
+                '...',
+                'etc/ansible'
+            )
         ;
     }
 
@@ -72,6 +79,7 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
 
         $configuration = $this->createApplicationConfiguration([
             'root_directory' => $input->getOption('directory'),
+            'prefix' => $input->getOption('prefix'),
         ]);
         $io->write(' Configuring modules...');
 
