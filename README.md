@@ -13,5 +13,5 @@ composer require johnkrovitch/deploy-bundle
 
 # Usage
 ```php
-bin/app.php deploy:generate-configuration
+bin/deployer.php deploy:generate-configuration
 ```

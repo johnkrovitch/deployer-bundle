@@ -2,7 +2,7 @@
 
 namespace JK\DeployBundle\Module;
 
-interface TaskModuleInterface
+interface LateModuleInterface
 {
     public function setTasks(array $tasks);
 }

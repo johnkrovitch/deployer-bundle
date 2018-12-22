@@ -27,9 +27,9 @@ class DatabaseModule extends AbstractModule
             'On which port the database server is called  (usually 3306) ?',
             3306
         );
-        $nameQuestion = new Question('What is the name of your database on your server ?', 'test.org');
-        $userQuestion = new Question('What is the database user ?', 'test_user');
-        $passwordQuestion = new Question('What is the user password ?', 'test_password');
+        $nameQuestion = new Question('What is the name of your database on your server ?', 'my_database');
+        $userQuestion = new Question('What is the database user ?', 'my_user');
+        $passwordQuestion = new Question('What is the user password ?', 'my_password');
         $passwordQuestion->setHidden(true);
 
         return [

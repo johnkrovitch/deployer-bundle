@@ -7,7 +7,7 @@ use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
 use JK\DeployBundle\Module\Registry\ModuleRegistry;
 use JK\DeployBundle\Module\Registry\ModuleRegistryInterface;
-use JK\DeployBundle\Module\TaskModuleInterface;
+use JK\DeployBundle\Module\LateModuleInterface;
 use JK\DeployBundle\Template\Generator\TemplateGenerator;
 use JK\DeployBundle\Template\TemplateInterface;
 use JK\DeployBundle\Template\Twig\TwigTemplate;
@@ -33,7 +33,8 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
                 'directory',
                 'd',
                 InputOption::VALUE_OPTIONAL,
-                'The directory where the deploy files will be generated'
+                'The directory where the deploy files will be generated',
+                __DIR__.'/../../etc/ansible/'
             )
             ->addOption(
                 'clean',
@@ -67,7 +68,6 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         if ($input->getOption('clear-cache')) {
             $cache->clear();
         }
-
         /** @var ModuleRegistryInterface $registry */
         $registry = $this->container->get(ModuleRegistry::class);
         $environmentVars = [];
@@ -76,6 +76,9 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
             $this->clean($input->getOption('directory'));
         }
 
+        if (!file_exists($input->getOption('directory'))) {
+            mkdir($input->getOption('directory'), 0700, true);
+        }
         $configuration = $this->createApplicationConfiguration([
             'root_directory' => $input->getOption('directory'),
             'prefix' => $input->getOption('prefix'),
@@ -140,7 +143,7 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
             if ($module instanceof EnvironmentModuleInterface) {
                 $module->setEnv($environmentVars);
             }
-            if ($module instanceof TaskModuleInterface) {
+            if ($module instanceof LateModuleInterface) {
                 $lateModules[] = $module;
                 continue;
             }

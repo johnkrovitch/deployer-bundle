@@ -3,10 +3,10 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
-use JK\DeployBundle\Module\TaskModuleInterface;
+use JK\DeployBundle\Module\LateModuleInterface;
 use JK\DeployBundle\Template\Twig\TwigTemplate;
 
-class PlaybookModule extends AbstractModule implements TaskModuleInterface
+class PlaybookModule extends AbstractModule implements LateModuleInterface
 {
     private $tasks = [];
 

@@ -22,7 +22,7 @@ class GitModule extends AbstractModule implements EnvironmentModuleInterface
         return [
             'repository' => new Question(
                 'What is the address of your code repository',
-                'git@github.com/MyRepository'
+                'git@github.com/my_repository'
             ),
             'version' => new Question(
                 'What is the git reference you want to deploy (it can be a branch, a tag or a commit)',
