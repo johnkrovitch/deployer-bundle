@@ -16,11 +16,6 @@ class HostModule extends AbstractModule implements EnvironmentModuleInterface
         return 'hosts';
     }
 
-    public function getPriority(): int
-    {
-        return self::PRIORITY_INITIALIZE;
-    }
-
     public function getQuestions(): array
     {
         return [

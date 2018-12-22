@@ -13,8 +13,11 @@ $bundle = new \JK\DeployBundle\JKDeployBundle();
 $bundle->build($container);
 
 $extension = $bundle->getContainerExtension();
-$container->registerExtension($extension);
-$container->loadFromExtension($extension->getAlias());
+
+if (null !== $extension) {
+    $container->registerExtension($extension);
+    $container->loadFromExtension($extension->getAlias());
+}
 
 $loader = new Twig_Loader_Filesystem(realpath(__DIR__.'/../src/Resources/views'));
 $twig = new Twig_Environment($loader, [
