@@ -10,7 +10,7 @@ install:
     - composer install --dev
 
 before_script:
-    - mkdir var/cache
+    - mkdir var/cache -p
 
 script:
     - bin/phpunit --coverage-text --coverage-clover=coverage.clover
