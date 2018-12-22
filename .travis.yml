@@ -11,6 +11,7 @@ install:
 
 before_script:
     - mkdir var/cache -p
+    - chmod 777 -R var/cache
 
 script:
     - bin/phpunit --coverage-text --coverage-clover=coverage.clover
