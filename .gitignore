@@ -1,5 +1,5 @@
-bin
-!bin/app.php
+bin/*
+!bin/deployer.php
 cache
 var
 vendor

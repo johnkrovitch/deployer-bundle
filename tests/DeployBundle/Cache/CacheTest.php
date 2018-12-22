@@ -13,7 +13,7 @@ class CacheTest extends TestBase
     public function setUp()
     {
         if (!file_exists($this->cacheDirectory)) {
-            mkdir($this->cacheDirectory, 777, true);
+            mkdir($this->cacheDirectory, 0777, true);
         }
 
         if (file_exists($this->cacheDirectory.'/deploy.cache')) {
