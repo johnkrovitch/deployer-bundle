@@ -12,7 +12,7 @@ class ModuleRegistry implements ModuleRegistryInterface
     private $frozen = false;
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function add(ModuleInterface $module): void
     {
@@ -28,7 +28,7 @@ class ModuleRegistry implements ModuleRegistryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function get(string $name): ModuleInterface
     {
@@ -44,7 +44,7 @@ class ModuleRegistry implements ModuleRegistryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function has(string $name): bool
     {
@@ -52,18 +52,19 @@ class ModuleRegistry implements ModuleRegistryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function all(): array
     {
         if (!$this->isFrozen()) {
             throw new Exception('The registry is not frozen');
         }
+
         return $this->registry;
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function freeze(): void
     {
@@ -75,7 +76,7 @@ class ModuleRegistry implements ModuleRegistryInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function isFrozen(): bool
     {

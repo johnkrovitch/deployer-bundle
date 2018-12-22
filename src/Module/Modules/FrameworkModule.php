@@ -3,7 +3,6 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
-use JK\DeployBundle\Module\ModuleInterface;
 use JK\DeployBundle\Template\TemplateInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
@@ -50,7 +49,6 @@ class FrameworkModule extends AbstractModule
         ];
 
         return [
-            //$this->getDeployTemplate(),
             $this->getExtraTemplate(),
             $this->createCopyTemplate(
                 $frameworkDeployMapping[$this->framework],
@@ -58,20 +56,6 @@ class FrameworkModule extends AbstractModule
                 TemplateInterface::TYPE_DEPLOY
             ),
         ];
-    }
-
-    private function getDeployTemplate(): ?TemplateInterface
-    {
-        $mapping = [
-            self::FRAMEWORK_SYMFONY => '../../templates/symfony/env.yml.j2',
-            self::FRAMEWORK_SYMFONY_LEGACY => '../../templates/symfony/parameters.yml.j2',
-        ];
-
-        return $this->createDeployTemplate(
-            'Deploy/framework.configuration.yaml',
-            'tasks/deploy/framework.configuration.yaml', [
-            'framework.configuration_template' => $mapping[$this->framework],
-        ]);
     }
 
     private function getExtraTemplate(): ?TemplateInterface

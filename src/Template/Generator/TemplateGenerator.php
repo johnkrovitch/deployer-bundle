@@ -83,7 +83,6 @@ class TemplateGenerator implements TemplateGeneratorInterface
         $content = file_get_contents($template->getSource());
 
         if ($template->appendToFile()) {
-
             if (!$this->fileSystem->exists($path)) {
                 $this->fileSystem->touch($path);
             }

@@ -2,7 +2,6 @@
 
 namespace JK\DeployBundle\Template;
 
-
 class CopyTemplate implements TemplateInterface
 {
     private $source;

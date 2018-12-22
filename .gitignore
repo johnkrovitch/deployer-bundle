@@ -1,5 +1,6 @@
 bin/*
 !bin/deployer.php
 cache
+.php_cs.cache
 var
 vendor

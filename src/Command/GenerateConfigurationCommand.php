@@ -3,7 +3,6 @@
 namespace JK\DeployBundle\Command;
 
 use JK\DeployBundle\Cache\Cache;
-use JK\DeployBundle\Cache\CacheInterface;
 use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
 use JK\DeployBundle\Module\Registry\ModuleRegistry;
@@ -138,7 +137,6 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         $lateModules = [];
 
         foreach ($registry->all() as $module) {
-
             if ($module instanceof EnvironmentModuleInterface) {
                 $module->setEnv($environmentVars);
             }
@@ -152,7 +150,6 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         }
         $io->write('[<info>OK</info>]');
         $io->newLine();
-
 
         $io->text('Generating deployment files...');
         $tasks = $this->generateTemplates($templates, $configuration, $io);
@@ -212,7 +209,6 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
         });
 
         foreach ($templates as $template) {
-
             if (!$configuration->get('deploy_tasks') && TwigTemplate::TYPE_DEPLOY === $template->getType()) {
                 continue;
             }

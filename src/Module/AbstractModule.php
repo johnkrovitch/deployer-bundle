@@ -23,6 +23,9 @@ abstract class AbstractModule implements ModuleInterface
 
     public function configure(ApplicationConfiguration $configuration): void
     {
+        if (!$configuration->isResolved()) {
+            throw new Exception('The application configuration should be resolved before using it in a module');
+        }
         $this->fileSystem = new Filesystem();
         $rootDirectory = $configuration->get('root_directory');
 
@@ -54,8 +57,7 @@ abstract class AbstractModule implements ModuleInterface
         string $type,
         array $parameters = [],
         int  $priority = TemplateInterface::PRIORITY_APPLICATION
-    ): TemplateInterface
-    {
+    ): TemplateInterface {
         return new TwigTemplate(
             $source,
             $target,
@@ -72,7 +74,6 @@ abstract class AbstractModule implements ModuleInterface
         int $priority = TemplateInterface::PRIORITY_APPLICATION,
         string $resourceRoot = null
     ): TemplateInterface {
-
         if (null === $resourceRoot) {
             $resourceRoot = __DIR__.'/../Resources/views/';
         }
@@ -91,8 +92,7 @@ abstract class AbstractModule implements ModuleInterface
         string $target,
         array $parameters = [],
         int  $priority = TemplateInterface::PRIORITY_APPLICATION
-    ): TemplateInterface
-    {
+    ): TemplateInterface {
         return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_DEPLOY, $parameters, $priority);
     }
 
@@ -101,8 +101,7 @@ abstract class AbstractModule implements ModuleInterface
         string $target,
         array $parameters = [],
         int  $priority = TemplateInterface::PRIORITY_APPLICATION
-    ): TemplateInterface
-    {
+    ): TemplateInterface {
         return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_INSTALL, $parameters, $priority);
     }
 
@@ -111,8 +110,7 @@ abstract class AbstractModule implements ModuleInterface
         string $target,
         array $parameters = [],
         int  $priority = TemplateInterface::PRIORITY_APPLICATION
-    ): TemplateInterface
-    {
+    ): TemplateInterface {
         return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_ROLLBACK, $parameters, $priority);
     }
 
@@ -121,8 +119,7 @@ abstract class AbstractModule implements ModuleInterface
         string $target,
         array $parameters = [],
         int  $priority = TemplateInterface::PRIORITY_APPLICATION
-    ): TemplateInterface
-    {
+    ): TemplateInterface {
         return $this->createTwigTemplate($source, $target, TemplateInterface::TYPE_EXTRA, $parameters, $priority);
     }
 }
