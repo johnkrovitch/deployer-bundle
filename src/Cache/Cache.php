@@ -28,6 +28,11 @@ class Cache implements CacheInterface
     {
         $this->fileSystem = new Filesystem();
 
+        if ('' === $cacheDirectory) {
+            $cacheDirectory = __DIR__ . '/../../var/cache';
+            $this->fileSystem->mkdir($cacheDirectory);
+        }
+
         if (!$this->fileSystem->exists($cacheDirectory)) {
             throw new Exception('The cache directory "'.$cacheDirectory.'" does not exists');
         }
