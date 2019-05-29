@@ -3,11 +3,15 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
+use JK\DeployBundle\Module\EnvironmentModuleInterface;
+use JK\DeployBundle\Module\Traits\EnvironmentModuleTrait;
 use JK\DeployBundle\Template\TemplateInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-class FrameworkModule extends AbstractModule
+class FrameworkModule extends AbstractModule implements EnvironmentModuleInterface
 {
+    use EnvironmentModuleTrait;
+
     const FRAMEWORK_SYMFONY = 'symfony';
     const FRAMEWORK_SYMFONY_LEGACY = 'symfony_legacy';
 

@@ -2,5 +2,6 @@
   composer:
     command: install
     working_dir: '{{ deploy_helper.new_release_path }}'
-    no_dev: false
+    no_dev: yes
+    no_scripts: yes
     optimize_autoloader: yes

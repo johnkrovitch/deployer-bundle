@@ -45,6 +45,11 @@ services:
         tags:
             - {name: deploy.module}
 
+    JK\DeployBundle\Module\Modules\NginxModule:
+        class: JK\DeployBundle\Module\Modules\NginxModule
+        tags:
+            - {name: deploy.module}
+
     ### Cache ###
     JK\DeployBundle\Cache\Cache:
         class: JK\DeployBundle\Cache\Cache

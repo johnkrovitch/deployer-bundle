@@ -5,6 +5,7 @@ namespace JK\DeployBundle\Command;
 use JK\DeployBundle\Cache\Cache;
 use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
+use JK\DeployBundle\Module\OptionableModuleInterface;
 use JK\DeployBundle\Module\Registry\ModuleRegistry;
 use JK\DeployBundle\Module\Registry\ModuleRegistryInterface;
 use JK\DeployBundle\Module\LateModuleInterface;
@@ -15,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
@@ -96,6 +98,18 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
             foreach ($registry->all() as $module) {
                 $questions = $module->getQuestions();
                 $answers = [];
+
+                if ($module instanceof OptionableModuleInterface) {
+                    $answer = $io->askQuestion(new ChoiceQuestion(
+                        'Do you want to use the module "'.$module->getName().'" ?', ['yes', 'no']
+                    ));
+
+                    if ('no' === $answer) {
+                        $io->text('Ok ! Skipping the module "'.$module->getName().'"');
+
+                        continue;
+                    }
+                }
 
                 foreach ($questions as $name => $question) {
                     $answer = $io->askQuestion($question);

@@ -1,3 +1,8 @@
+- name: Copy the DotEnv file
+  template:
+    src: ../templates/symfony/.env.local.j2
+    dest: '{{ deploy_helper.new_release_path }}/.env.local'
+
 - name: Clear the Symfony cache
   shell: '{{ deploy_helper.new_release_path }}/bin/console cache:clear --env=prod'
 

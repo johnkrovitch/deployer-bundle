@@ -3,11 +3,12 @@
 namespace JK\DeployBundle\Module\Modules;
 
 use JK\DeployBundle\Module\AbstractModule;
+use JK\DeployBundle\Module\OptionableModuleInterface;
 use JK\DeployBundle\Template\TemplateInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
-class DatabaseModule extends AbstractModule
+class DatabaseModule extends AbstractModule implements OptionableModuleInterface
 {
     public function getName(): string
     {

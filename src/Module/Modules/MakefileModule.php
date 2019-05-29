@@ -5,9 +5,13 @@ namespace JK\DeployBundle\Module\Modules;
 use JK\DeployBundle\Configuration\ApplicationConfiguration;
 use JK\DeployBundle\Module\AbstractModule;
 use JK\DeployBundle\Module\EnvironmentModuleInterface;
+use JK\DeployBundle\Module\Traits\EnvironmentModuleTrait;
+use JK\DeployBundle\Template\Twig\TwigTemplate;
 
 class MakefileModule extends AbstractModule implements EnvironmentModuleInterface
 {
+    use EnvironmentModuleTrait;
+
     /**
      * @var array
      */
@@ -40,20 +44,16 @@ class MakefileModule extends AbstractModule implements EnvironmentModuleInterfac
             $source = $this->rootDirectory.'/makefile';
         }
         $template = $this->createExtraTemplate($source, '../../Makefile', [
-            'env' => $this->env['env'],
+            'env' => $this->env['hosts.env'],
             'prefix' => $this->prefix,
         ]);
-        $template->setAppendToFile(true);
+
+        if ($template instanceof TwigTemplate) {
+            $template->setAppendToFile(true);
+        }
 
         return [
             $template,
-        ];
-    }
-
-    public function setEnv(array $env): void
-    {
-        $this->env = [
-            'env' => $env['hosts.env'],
         ];
     }
 }

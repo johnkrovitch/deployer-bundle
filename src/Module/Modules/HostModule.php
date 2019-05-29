@@ -22,7 +22,7 @@ class HostModule extends AbstractModule implements EnvironmentModuleInterface
             'env' => new Question('What is the target environment name (staging, production...)', 'production'),
             'address' => new Question('What is address of your server', '91.23.55.235'),
             'port' => new Question('What is the ssh port of your server', '22'),
-            'user' => new Question('What is the user used to log into your server', 'user'),
+            'user' => new Question('Which user is used to log into your server', 'user'),
             'project_path' => new Question('What is the path of your project on your server ?', '/var/www/symfony'),
         ];
     }
