@@ -15,4 +15,13 @@ trait EnvironmentModuleTrait
     {
         return $values;
     }
+
+    public function getEnv(string $parameter, $default = null)
+    {
+        if (key_exists($parameter, $this->env)) {
+            return $this->env[$parameter];
+        }
+
+        return $default;
+    }
 }

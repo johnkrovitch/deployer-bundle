@@ -13,11 +13,6 @@ class MakefileModule extends AbstractModule implements EnvironmentModuleInterfac
     use EnvironmentModuleTrait;
 
     /**
-     * @var array
-     */
-    private $env;
-
-    /**
      * @var string
      */
     private $prefix;

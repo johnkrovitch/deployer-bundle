@@ -101,15 +101,17 @@ class GenerateConfigurationCommand extends Command implements ContainerAwareInte
 
                 if ($module instanceof OptionableModuleInterface) {
                     $answer = $io->askQuestion(new ChoiceQuestion(
-                        'Do you want to use the module "'.$module->getName().'" ?', ['yes', 'no']
+                        'Do you want to use the module "'.$module->getName().'" ?', ['yes', 'no'], 'yes'
                     ));
 
                     if ('no' === $answer) {
+                        $environmentVars[$module->getName().'.enabled'] = false;
                         $io->text('Ok ! Skipping the module "'.$module->getName().'"');
 
                         continue;
                     }
                 }
+                $environmentVars[$module->getName().'.enabled'] = true;
 
                 foreach ($questions as $name => $question) {
                     $answer = $io->askQuestion($question);

@@ -1,0 +1,76 @@
+{% if use_ssl == true %}
+    <VirtualHost *:1443>
+        ServerAdmin {{ server_admin }}
+        ServerName {{ server_name }}
+        {% if server_alias is defined %}
+            ServerAlias {{ server_alias }}
+        {% endif %}
+        DocumentRoot {{ server_document_root }}
+
+        <Directory {{ server_document_root }}>
+            Options +Indexes  +FollowSymLinks
+            DirectoryIndex app.php
+            AllowOverride All
+
+            {% if add_basic_auth == true %}
+                AuthType Basic
+                AuthName "Restricted Content"
+                AuthUserFile {{ project_path }}/auth/passwdfile
+                Require valid-user
+            {% else %}
+                Require all granted
+            {% endif %}
+        </Directory>
+
+        <IfModule mpm_itk_module>
+            AssignUserId {{ ansible_user }} www-data
+        </IfModule>
+
+        # Possible values include: debug, info, notice, warn, error, crit,
+        # alert, emerg.
+        LogLevel warn
+        ErrorLog ${APACHE_LOG_DIR}/{{ server_name }}-error.log
+        CustomLog ${APACHE_LOG_DIR}/{{ server_name }}-access.log combined
+
+        {% if use_ssl == true %}
+            SSLEngine ON
+            SSLCertificateFile {{ ssl_certificate_file }}
+            SSLCertificateKeyFile {{ ssl_certificate_keyfile }}
+            SSLCertificateChainFile {{ ssl_certificate_chainfile }}
+        {% endif %}
+    </VirtualHost>
+{% endif %}
+
+<VirtualHost *:8080>
+    ServerAdmin {{ server_admin }}
+    ServerName {{ server_name }}
+    {% if server_alias is defined %}
+        ServerAlias {{ server_alias }}
+    {% endif %}
+    DocumentRoot {{ server_document_root }}
+
+    <Directory {{ server_document_root }}>
+        Options +Indexes  +FollowSymLinks
+        DirectoryIndex app.php
+        AllowOverride All
+
+        {% if add_basic_auth == true %}
+            AuthType Basic
+            AuthName "Restricted Content"
+            AuthUserFile {{ project_path }}/auth/passwdfile
+            Require valid-user
+        {% else %}
+            Require all granted
+        {% endif %}
+    </Directory>
+
+    <IfModule mpm_itk_module>
+        AssignUserId {{ ansible_user }} www-data
+    </IfModule>
+
+    # Possible values include: debug, info, notice, warn, error, crit,
+    # alert, emerg.
+    LogLevel warn
+    ErrorLog ${APACHE_LOG_DIR}/{{ server_name }}-error.log
+    CustomLog ${APACHE_LOG_DIR}/{{ server_name }}-access.log combined
+</VirtualHost>

@@ -1,6 +1,19 @@
-- name: Finalize the deploy for the release "{{ deploy_helper.new_release }}" (clean releases, switch current symlink)
+- name: Set the permissions for the releases directory (to avoid issues when removing old releases with uploaded files)
+  file:
+    path: '{{ deploy_helper.releases_path }}'
+    state: directory
+    owner: admin
+    group: www-data
+    recurse: yes
+    force: yes
+  with_items:
+    - '{{ deploy_helper.new_release_path }}/var/log'
+    - '{{ deploy_helper.new_release_path }}/var/cache'
+  become: yes
+
+- name: Finalize the deploy for the release "{{ deploy_helper.new_release }}" (switch current symlink)
   deploy_helper:
     path: '{{ project_path }}'
     release: '{{ deploy_helper.new_release }}'
     state: finalize
-    keep_releases: 5
+    keep_releases: 3

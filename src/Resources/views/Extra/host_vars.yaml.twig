@@ -6,8 +6,10 @@ ansible_port: {{ ansible_port }}
 
 {% for moduleName, module in data %}
 ### {{ moduleName | capitalize }} ###
+{{ moduleName }}:
 {% for name, value in module %}
-{{ moduleName }}.{{ name }}: {{ value }}
+    {% if value is iterable %}{{ name }}: {{ value | join(' ') }}{% else %}{{ name }}: {{ value }}{% endif %}
+
 {% endfor %}
 
 {% endfor %}

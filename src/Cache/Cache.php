@@ -4,6 +4,7 @@ namespace JK\DeployBundle\Cache;
 
 use JK\DeployBundle\Exception\Exception;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Yaml;
 
 class Cache implements CacheInterface
 {
@@ -48,7 +49,7 @@ class Cache implements CacheInterface
         $cache = $this->all();
         $cache[$key] = $data;
 
-        $this->fileSystem->dumpFile($this->cacheFile, serialize($cache));
+        $this->fileSystem->dumpFile($this->cacheFile, Yaml::dump($cache));
     }
 
     public function get(string $key)
@@ -64,7 +65,7 @@ class Cache implements CacheInterface
 
     public function all(): array
     {
-        $cache = unserialize(file_get_contents($this->cacheFile));
+        $cache = Yaml::parse(file_get_contents($this->cacheFile));
 
         if (false === $cache) {
             $cache = [];
@@ -75,6 +76,6 @@ class Cache implements CacheInterface
 
     public function clear(): void
     {
-        $this->fileSystem->dumpFile($this->cacheFile, serialize([]));
+        $this->fileSystem->dumpFile($this->cacheFile, Yaml::dump([]));
     }
 }
